@@ -58,23 +58,56 @@ const Wire = ({ x1, y1, x2, y2, active = false }) => (
     </g>
 );
 
-const BlockDiagram = ({ currentStep }) => {
+const BlockDiagram = ({ circuit, currentStep }) => {
+    const blocks = circuit?.blocks || [];
+    const hasData = blocks.length > 0;
+
     return (
         <svg width="100%" height="100%" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
-            {/* Power to MCU */}
-            <Wire x1={100} y1={200} x2={250} y2={200} active={currentStep > 1} />
+            {hasData ? (
+                <>
+                    {/* Dynamic connections could be added here */}
+                    <Wire x1={100} y1={200} x2={250} y2={200} active={true} />
 
-            {/* MCU to Sensor */}
-            <Wire x1={350} y1={200} x2={450} y2={100} active={currentStep > 2} />
+                    {blocks.map((block, idx) => {
+                        const x = 100 + (idx % 3) * 200;
+                        const y = 100 + Math.floor(idx / 3) * 150;
+                        let Icon = Cpu;
+                        if (block.type === 'power_supply') Icon = Zap;
+                        if (block.type.includes('sensor')) Icon = Activity;
+                        if (block.type.includes('driver')) Icon = Bell;
 
-            {/* MCU to Output */}
-            <Wire x1={350} y1={200} x2={450} y2={300} active={currentStep > 3} />
+                        return (
+                            <Node
+                                key={block.id}
+                                x={x}
+                                y={y}
+                                icon={Icon}
+                                label={block.name}
+                                status="active"
+                            />
+                        );
+                    })}
+                </>
+            ) : (
+                <>
+                    {/* Fallback to static mock while generating or if no data */}
+                    {/* Power to MCU */}
+                    <Wire x1={100} y1={200} x2={250} y2={200} active={currentStep > 1} />
 
-            {/* Nodes */}
-            <Node x={100} y={200} icon={Zap} label="12V POWER" status={currentStep >= 1 ? 'active' : 'idle'} />
-            <Node x={300} y={200} icon={Cpu} label="ESP32-S3" status={currentStep >= 2 ? 'active' : 'idle'} />
-            <Node x={500} y={100} icon={Activity} label="SENSOR" status={currentStep >= 3 ? 'active' : 'idle'} />
-            <Node x={500} y={300} icon={Bell} label="RELAY" status={currentStep >= 4 ? 'active' : 'idle'} />
+                    {/* MCU to Sensor */}
+                    <Wire x1={350} y1={200} x2={450} y2={100} active={currentStep > 2} />
+
+                    {/* MCU to Output */}
+                    <Wire x1={350} y1={200} x2={450} y2={300} active={currentStep > 3} />
+
+                    {/* Nodes */}
+                    <Node x={100} y={200} icon={Zap} label="12V POWER" status={currentStep >= 1 ? 'active' : 'idle'} />
+                    <Node x={300} y={200} icon={Cpu} label="ESP32-S3" status={currentStep >= 2 ? 'active' : 'idle'} />
+                    <Node x={500} y={100} icon={Activity} label="SENSOR" status={currentStep >= 3 ? 'active' : 'idle'} />
+                    <Node x={500} y={300} icon={Bell} label="RELAY" status={currentStep >= 4 ? 'active' : 'idle'} />
+                </>
+            )}
 
             <style jsx>{`
         .node-icon {

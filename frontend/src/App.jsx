@@ -22,12 +22,16 @@ import BlockDiagram from './components/BlockDiagram';
 import SchematicView from './components/SchematicView';
 import PCBView from './components/PCBView';
 import BOMView from './components/BOMView';
+import { generateHardware, getDownloadUrl } from './api';
 
 const App = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTab, setActiveTab] = useState('block');
   const [prompt, setPrompt] = useState('');
+  const [circuitData, setCircuitData] = useState(null);
+  const [files, setFiles] = useState({});
+  const [error, setError] = useState(null);
 
   const steps = [
     { id: 'parsing', label: 'Understanding Intent', icon: Search },
@@ -46,21 +50,32 @@ const App = () => {
     "Smart door lock"
   ];
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!prompt) return;
     setIsGenerating(true);
     setCurrentStep(0);
-  };
+    setError(null);
+    setCircuitData(null);
 
-  // Mock progress
-  useEffect(() => {
-    if (isGenerating && currentStep < steps.length) {
-      const timer = setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
-      }, 1500);
-      return () => clearTimeout(timer);
+    try {
+      // Start mock progress while fetching
+      const progressTimer = setInterval(() => {
+        setCurrentStep(prev => (prev < 2 ? prev + 1 : prev));
+      }, 1000);
+
+      const result = await generateHardware(prompt);
+
+      clearInterval(progressTimer);
+
+      // Fast forward to complete
+      setCurrentStep(steps.length);
+      setCircuitData(result.circuit);
+      setFiles(result.files);
+    } catch (err) {
+      setError(err.message);
+      setIsGenerating(false);
     }
-  }, [isGenerating, currentStep]);
+  };
 
   return (
     <div className="app-container">
@@ -242,7 +257,7 @@ const App = () => {
                             exit={{ opacity: 0, scale: 0.95 }}
                             className="viz-container"
                           >
-                            <BOMView />
+                            <BOMView circuit={circuitData} />
                           </motion.div>
                         )}
                         {activeTab === 'manufacturing' && (
@@ -253,7 +268,22 @@ const App = () => {
                             <div className="placeholder-viz">
                               <Download size={48} />
                               <p>Manufacturing Files Ready</p>
-                              <button className="btn-primary" style={{ marginTop: '1rem' }}>Export Gerber + NC Drill</button>
+                              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <a
+                                  href={files.bom ? getDownloadUrl(files.bom) : '#'}
+                                  className="btn-primary"
+                                  download
+                                >
+                                  Download BOM
+                                </a>
+                                <a
+                                  href={files.schematic ? getDownloadUrl(files.schematic) : '#'}
+                                  className="btn-primary"
+                                  download
+                                >
+                                  Download KiCad Schematic
+                                </a>
+                              </div>
                             </div>
                           </motion.div>
                         )}
@@ -295,37 +325,48 @@ const App = () => {
                   <div className="inspector-grid">
                     <div className="stat-card">
                       <label>MCU</label>
-                      <div className="value">ESP32-S3</div>
+                      <div className="value">
+                        {circuitData?.blocks.find(b => b.type === 'mcu')?.metadata.part_number || 'Detecting...'}
+                      </div>
                     </div>
                     <div className="stat-card">
                       <label>Voltage</label>
-                      <div className="value">3.3V / 12V</div>
+                      <div className="value">
+                        {circuitData?.intent.power_source === 'USB_5V' ? '5V' : '12V'} → 3.3V
+                      </div>
                     </div>
                     <div className="stat-card">
                       <label>Board Size</label>
-                      <div className="value">80 x 60 mm</div>
+                      <div className="value">
+                        {circuitData?.intent.pcb_size.width} x {circuitData?.intent.pcb_size.height} mm
+                      </div>
                     </div>
                     <div className="stat-card">
                       <label>Est. Cost</label>
-                      <div className="value">$4.20</div>
+                      <div className="value">
+                        ${((circuitData?.components.length || 0) * 0.28).toFixed(2)}
+                      </div>
                     </div>
                   </div>
 
                   <div className="readiness-section">
                     <div className="readiness-header">
                       <label>Manufacturing Readiness</label>
-                      <span>85%</span>
+                      <span>{circuitData ? '100%' : '20%'}</span>
                     </div>
                     <div className="progress-bar">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: '85%' }}
+                        animate={{ width: circuitData ? '100%' : '20%' }}
                         className="progress-fill"
                       />
                     </div>
                   </div>
 
-                  <button className="btn-download primary pulse">
+                  <button
+                    className={`btn-download primary ${circuitData ? 'pulse' : 'disabled'}`}
+                    onClick={() => setActiveTab('manufacturing')}
+                  >
                     <Download size={18} />
                     <span>Download Production Files</span>
                   </button>

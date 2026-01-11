@@ -1,41 +1,41 @@
 import React from 'react';
+import { ClipboardList } from 'lucide-react';
 
-const BOMView = () => {
-    const components = [
-        { ref: 'U1', designator: 'ESP32-S3', package: 'QFN-56', qty: 1, cost: '$2.50' },
-        { ref: 'U2', designator: 'AMS1117-3.3', package: 'SOT-223', qty: 1, cost: '$0.15' },
-        { ref: 'C1', designator: '10uF', package: '0805', qty: 2, cost: '$0.04' },
-        { ref: 'R1', designator: '10k', package: '0603', qty: 5, cost: '$0.02' },
-        { ref: 'D1', designator: '1N4148', package: 'SOD-123', qty: 1, cost: '$0.05' },
-    ];
+const BOMView = ({ circuit }) => {
+  const components = circuit?.components || [];
 
-    return (
-        <div className="bom-view">
-            <div className="bom-card glass">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Ref</th>
-                            <th>Component</th>
-                            <th>Package</th>
-                            <th>Qty</th>
-                            <th>Cost</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {components.map((c, i) => (
-                            <tr key={i}>
-                                <td className="mono">{c.ref}</td>
-                                <td>{c.designator}</td>
-                                <td className="mono">{c.package}</td>
-                                <td>{c.qty}</td>
-                                <td className="price">{c.cost}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <style jsx>{`
+  return (
+    <div className="bom-view">
+      {!circuit ? (
+        <div className="placeholder-viz">
+          <ClipboardList size={48} />
+          <p>Designing BOM...</p>
+        </div>
+      ) : (
+        <div className="bom-card glass">
+          <table>
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Component</th>
+                <th>Package</th>
+                <th>Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {components.map((c, i) => (
+                <tr key={i}>
+                  <td className="mono">{c.designator}</td>
+                  <td>{c.part_number}</td>
+                  <td className="mono">{c.footprint}</td>
+                  <td>1</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <style jsx>{`
         .bom-view {
           padding: 2rem;
           width: 100%;
@@ -80,8 +80,8 @@ const BOMView = () => {
           background: var(--primary-glow);
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default BOMView;
