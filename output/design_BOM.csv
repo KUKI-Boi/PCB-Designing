@@ -1,0 +1,16 @@
+Item,Qty,References,Value,Footprint,MPN,Description,Datasheet
+1,1,C1,10uF,Capacitor_SMD:C_0805_2012Metric,CL21A106KAYNNNE,Input decoupling capacitor,N/A
+2,1,C2,22uF,Capacitor_SMD:C_0805_2012Metric,CL21A226MQQNNNE,Output stabilization capacitor,N/A
+3,3,"C3, C4, C5",100nF,Capacitor_SMD:C_0603_1608Metric,CL10B104KB8NNNC,Decoupling capacitor,N/A
+4,1,D1,1N4007,Diode_SMD:D_SOD-123,1N4007,Reverse polarity protection,https://www.vishay.com/docs/88503/1n4001.pdf
+5,1,D2,1N4148,Diode_SMD:D_SOD-123,1N4148W,Flyback protection diode,https://www.vishay.com/docs/81857/1n4148.pdf
+6,1,J1,12V DC adapter,Connector_BarrelJack:BarrelJack_Horizontal,N/A,Power input connector,N/A
+7,1,J2,Soil_Sensor_Connector,Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical,N/A,Capacitive soil moisture sensor connector,N/A
+8,1,K1,5V_RELAY,Relay_THT:Relay_SPDT_Omron-G5LE-1,N/A,5V SPDT Relay,N/A
+9,1,Q1,2N2222,Package_TO_SOT_SMD:SOT-23,MMBT2222A,NPN switching transistor,https://www.onsemi.com/pdf/datasheet/mmbt2222alt1-d.pdf
+10,2,"R1, R2",10k,Resistor_SMD:R_0603_1608Metric,RC0603FR-0710KL,EN pull-up,N/A
+11,1,R3,1k,Resistor_SMD:R_0603_1608Metric,RC0603FR-071KL,Base current limiting,N/A
+12,1,SW1,RESET,Button_Switch_SMD:SW_SPST_CK_RS282G05A3,N/A,Reset button,N/A
+13,1,SW2,BOOT,Button_Switch_SMD:SW_SPST_CK_RS282G05A3,N/A,Boot mode button,N/A
+14,1,U1,AMS1117-3.3,Package_TO_SOT_SMD:SOT-223-3_TabPin2,AMS1117-3.3,3.3V LDO Regulator,http://www.advanced-monolithic.com/pdf/ds1117.pdf
+15,1,U2,ESP32-WROOM-32E,RF_Module:ESP32-WROOM-32,ESP32-WROOM-32E,ESP32 WiFi/BLE Module,https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32e_datasheet_en.pdf

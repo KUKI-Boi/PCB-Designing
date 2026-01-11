@@ -1,0 +1,17 @@
+# Environment
+.env
+venv/
+__pycache__/
+*.pyc
+
+# Generated files
+output/
+*.kicad_sch
+*.kicad_pcb
+*.csv
+gerbers/
+
+# IDE
+.vscode/
+.idea/
+*.swp
